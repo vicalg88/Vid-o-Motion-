@@ -228,11 +228,11 @@ export class Puzzle {
         varying vec3 vW;
         float ring(vec2 p, vec2 c, float t){
           if (t < 0.0 || t > 1.6) return 0.0;
-          float R = 0.03 + 0.62 * pow(t, 0.7);
+          float R = 0.03 + 0.42 * pow(t, 0.7);
           float d = length(p - c);
-          float w = 0.008 + 0.022 * t;
-          float a = exp(-pow((d - R) / w, 2.0)) * pow(1.0 - t / 1.6, 2.6) * 0.55;
-          float inner = exp(-d * d / (0.01 + R * R * 0.3)) * exp(-t * 6.0) * 0.35;
+          float w = 0.007 + 0.018 * t;
+          float a = exp(-pow((d - R) / w, 2.0)) * pow(1.0 - t / 1.6, 3.2) * 0.3;
+          float inner = exp(-d * d / (0.01 + R * R * 0.3)) * exp(-t * 7.0) * 0.22;
           return a + inner;
         }
         void main(){
@@ -243,9 +243,9 @@ export class Puzzle {
           if (uPress > 0.0 && uPress < 1.6) {
             vec2 q = abs(p - uLogoC) - vec2(0.5, 0.155);
             float d = length(max(q, 0.0)) + min(max(q.x, q.y), 0.0);
-            float R = 0.02 + 0.9 * pow(uPress, 0.6);
+            float R = 0.02 + 0.55 * pow(uPress, 0.6);
             float w = 0.012 + 0.03 * uPress;
-            v += exp(-pow((d - R) / w, 2.0)) * pow(1.0 - uPress / 1.6, 2.4) * 0.35;
+            v += exp(-pow((d - R) / w, 2.0)) * pow(1.0 - uPress / 1.6, 3.0) * 0.16;
           }
           vec3 col = vec3(0.92, 0.94, 1.0) * v * 0.9;
           gl_FragColor = vec4(col, 1.0);
@@ -342,8 +342,23 @@ export class Puzzle {
     return { pos, q: qWall.clone(), h: 1 };
   }
 
-  // point que le regard doit suivre pendant le ramassage
+  // point que le regard doit suivre (lissé dans le temps : léger retard naturel)
   focusPoint(t, body) {
+    let W = 0;
+    const acc = new THREE.Vector3();
+    let wsum = 0;
+    for (let k = 0; k < 6; k++) {
+      const f = this.focusRaw(t - k * 0.035, body);
+      if (!f) continue;
+      acc.addScaledVector(f.p, 1);
+      W += f.w;
+      wsum += 1;
+    }
+    if (!wsum) return null;
+    return { p: acc.multiplyScalar(1 / wsum), w: W / 6 };
+  }
+
+  focusRaw(t, body) {
     const items = [];
     this.pieces.forEach((p, i) => {
       const [p0, p1] = p.win;

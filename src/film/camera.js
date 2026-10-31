@@ -100,7 +100,7 @@ export class POV {
         look = i;
       }
       if (w <= 0) return;
-      const ai = aim(pos, v.center);
+      const ai = aim(pos, v.center.clone().add(new THREE.Vector3(0, -0.24, 0)));
       yaw += clamp(ai.yaw, -1.5, 1.5) * w;
       pitch = mix(pitch, ai.pitch, w);
     });

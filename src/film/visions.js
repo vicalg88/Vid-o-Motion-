@@ -28,7 +28,7 @@ class Vision {
     world.scene.add(this.frame);
     if (label) {
       this.label = makeLabel(this.U, label[0], label[1], { width: 2.3, glow: label[2] });
-      this.label.position.set(0, -0.98, 0.95);
+      this.label.position.set(0, -0.86, 0.95);
       this.frame.add(this.label);
     }
     this.mats = [];
