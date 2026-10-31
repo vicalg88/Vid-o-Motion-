@@ -101,13 +101,14 @@ export class Post {
           uSeed: { value: 0 },
           uCA: { value: 0.006 },
           uFade: { value: 0 },
+          uFlash: { value: 0 },
           uOverlay: { value: 1 },
           uSat: { value: 1.0 },
         },
         vertexShader: VS,
         fragmentShader: /* glsl */ `
           uniform sampler2D tColor, tOverlay; uniform vec2 uRes;
-          uniform float uTone, uExposure, uVignette, uGrain, uSeed, uCA, uFade, uOverlay, uSat;
+          uniform float uTone, uExposure, uVignette, uGrain, uSeed, uCA, uFade, uOverlay, uSat, uFlash;
           varying vec2 vUv;
           vec3 neutral(vec3 color){
             const float StartCompression = 0.8 - 0.04;
@@ -129,6 +130,7 @@ export class Post {
             vec2 d = vUv - 0.5;
             vec2 off = d * dot(d, d) * uCA;
             vec3 c = vec3(texture2D(tColor, vUv - off).r, texture2D(tColor, vUv).g, texture2D(tColor, vUv + off).b);
+            c += vec3(1.0, 0.95, 0.88) * uFlash * 3.0;
             vec3 tm = neutral(c * uExposure);
             c = mix(c, tm, uTone);
             float l = dot(c, vec3(0.2126, 0.7152, 0.0722));

@@ -1,32 +1,33 @@
 // ---------------------------------------------------------------------------
 // Timeline globale + utilitaires d'animation (tout est déterministe : f(t))
+// Film « Exprnc. » — POV onirique : porte -> 4 visions -> puzzle -> logo
 // ---------------------------------------------------------------------------
-export const FPS = 60;
-export const DURATION = 10;
+export const FPS = 30;
+export const DURATION = 23;
 export const FRAMES = FPS * DURATION;
 export const SHUTTER = 0.5; // obturateur 180° pour le flou de mouvement
 
-// Acte 1 : typographie  |  Acte 2 : puzzle 3D
-export const ACT2 = 4.25;
-
-// Moments clés (secondes) — utilisés aussi par le sound design (prep/sound.py lit timeline.json)
+// Moments clés (secondes) — lus aussi par le sound design (prep/sound.py)
 export const CUES = {
-  lettersIn: 0.3,
-  vowelsDrop: 1.55,
-  closeUp: 1.78,
-  dotLand: 2.5,
-  cut1: 3.3,
-  cut2: 3.4,
-  partsFall: 3.88,
-  act2: ACT2,
-  land: [4.47, 4.58, 4.7],
-  tremble: 5.28,
-  lift: [5.62, 5.5, 5.74],
-  lock: [6.86, 6.5, 7.16],
-  press: 7.36,
-  sweep: 8.05,
-  tagline: 8.3,
+  doorOpen: 0.7,
+  threshold: 2.1,
+  v1: [2.35, 5.05],
+  v2: [5.25, 7.95],
+  v3: [8.15, 10.85],
+  v4: [11.05, 13.75],
+  stumble: 14.25,
+  lookDown: 14.6,
+  pick1: [15.15, 16.45],
+  pick2: [16.6, 17.75],
+  pick3: [17.9, 19.0],
+  press: 19.25,
+  stepBack: 19.45,
+  sweep: 20.0,
+  tagline: 20.35,
 };
+export const VISIONS = [CUES.v1, CUES.v2, CUES.v3, CUES.v4];
+export const PICKS = [CUES.pick1, CUES.pick2, CUES.pick3];
+export const WALK_SPEED = 1.45; // m/s
 
 export const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 export const remap = (t, a, b) => clamp((t - a) / (b - a));
@@ -122,15 +123,13 @@ export function noise1(x, seed = 0) {
 
 // Nombre de sous-images (flou de mouvement) selon l'intensité du mouvement
 export function samplesAt(t) {
-  const fast = [
-    [0.25, 1.35, 6],
-    [1.45, 2.75, 10],
-    [3.25, 4.25, 10],
-    [4.25, 4.95, 10],
-    [5.4, 8.1, 8],
-  ];
-  for (const [a, b, n] of fast) if (t >= a && t < b) return n;
-  return 4;
+  const near = (a, w) => Math.abs(t - a) < w;
+  if (t >= 1.6 && t < 2.5) return 7;
+  for (const [a, b] of VISIONS) if (near(a, 0.45) || near(b, 0.45)) return 8;
+  if (t >= 14.15 && t < 14.9) return 10;
+  if (t >= 15.1 && t < 19.5) return 8;
+  if (t >= 19.5) return 4;
+  return 5;
 }
 
 // Interpolation cubique monotone (Fritsch-Carlson) : trajectoires C1 sans dépassement

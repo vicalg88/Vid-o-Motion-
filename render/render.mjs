@@ -32,8 +32,10 @@ const arg = (k, d) => {
 const W = +arg('w', 1920);
 const H = +arg('h', 1080);
 const Q = +arg('q', 1);
-const FPS = 60;
-const TOTAL = 600;
+// cadence et durée lues dans src/timeline.js
+const TL = fs.readFileSync(path.join(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'), 'src', 'timeline.js'), 'utf8');
+const FPS = +TL.match(/export const FPS = (\d+)/)[1];
+const TOTAL = Math.round(FPS * +TL.match(/export const DURATION = ([\d.]+)/)[1]);
 const OUTDIR = path.join(ROOT, 'output');
 const SEGDIR = path.resolve(arg('segdir', path.join(OUTDIR, 'segments')));
 const STILLDIR = path.resolve(arg('stilldir', path.join(OUTDIR, 'stills')));

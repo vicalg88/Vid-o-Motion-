@@ -178,8 +178,10 @@ print("tenons (cx, cy, r):", knobs)
 
 
 def left_region(line):
+    # la ligne est prolongée verticalement à l'infini aux deux bouts, pour que la
+    # région couvre toute la hauteur (sinon le bas du sticker sous le « p » était perdu)
     far = 10000.0
-    ring = np.vstack([line, [[-far, line[-1, 1]], [-far, line[0, 1]]]])
+    ring = np.vstack([[[line[0, 0], -far]], line, [[line[-1, 0], far], [-far, far], [-far, -far]]])
     p = Polygon(ring)
     if not p.is_valid:
         p = make_valid(p)

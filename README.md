@@ -1,18 +1,23 @@
-# Exprnc. — vidéo motion design (10 s)
+# Exprnc. — film motion design (POV onirique)
 
-Vidéo de présentation de 10 secondes, 1920×1080, 60 i/s, avec sound design, générée entièrement par code
-(rendu déterministe image par image).
+Film de présentation d'environ 23 s, 1920×1080, 30 i/s, avec sound design, généré entièrement par code
+(rendu déterministe image par image : three.js dans Chromium headless + ffmpeg).
 
 ## Storyboard
 
 | Temps | Plan |
 |---|---|
-| 0,0 – 1,5 s | Le mot « Expérience » apparaît lettre par lettre dans l'obscurité. |
-| 1,5 – 2,6 s | Les voyelles tombent, les consonnes se resserrent : « Exprnc. » (le point tombe en dernier). |
-| 3,3 – 4,25 s | Deux étincelles découpent le mot selon les vraies lignes de puzzle du logo, les 3 morceaux tombent. |
-| 4,25 – 5,5 s | Les 3 pièces de puzzle 3D du logo tombent et restent éparpillées au sol (poussière, ombres douces). |
-| 5,3 – 7,4 s | Les pièces vibrent, s'envolent (tonneau, pirouette) et s'emboîtent toutes seules (flash sur les jointures). |
-| 7,4 – 10 s | « Clac » final, la caméra passe en vue de dessus, reflet balayant, signature « L'expérience, pièce par pièce. » |
+| 0 – 2,3 s | Vue subjective : une porte noire cernée de lumière s'ouvre, on la franchit (éclair blanc). |
+| 2,3 – 5,1 s | Tête à gauche : vision **Escape game — Casino** (roulette, cartes, jetons, dés, cadenas, minuteur). |
+| 5,1 – 8,0 s | Tête à droite : vision **Murder party — Festival de cinéma** (tapis rouge, clap, pellicules, flashs, contour à la craie). |
+| 8,0 – 10,9 s | Tête à gauche : vision **Undercover** (silhouettes, masque, lasers, empreinte, dossiers confidentiels). |
+| 10,9 – 13,8 s | Tête à droite : vision **Exprnc. Food** (cocktails lumineux, agrumes, glaçons, coulée). |
+| 14,2 – 15 s | On trébuche, le regard tombe sur les 3 pièces du logo éparpillées au sol. |
+| 15 – 19,3 s | Les pièces sont ramassées une à une et fixées dans le vide (ondes sur un mur invisible, clics d'emboîtement). |
+| 19,3 – 23 s | Logo complet sur fond noir, reflet balayant et signature « DES EXPÉRIENCES QUI MARQUENT. » |
+
+Les visions sont des « souvenirs » : elles se matérialisent et se dissolvent (dissolution par bruit 3D à bords lumineux),
+flottent dans le noir et se reflètent sur un sol miroir.
 
 ## Structure
 
@@ -23,8 +28,13 @@ assets/fonts/            Montserrat (OFL)
 prep/vectorize.py        vectorisation du PNG -> logo.json
 prep/sound.py            sound design procédural -> output/audio.wav
 src/timeline.js          minutage global (CUES) + courbes d'animation
-src/act1.js              acte 1 : typographie (Canvas 2D)
-src/act2.js              acte 2 : puzzle 3D (three.js, ombres PCSS, particules)
+src/film/camera.js       caméra subjective (marche, regards, trébuchement, ramassage)
+src/film/world.js        vide noir, sol miroir, éclairages, poussière
+src/film/door.js         la porte
+src/film/visions.js      les 4 visions (concepts)
+src/film/textures.js     textures procédurales (cartes, roulette, clap, empreinte…)
+src/film/dream.js        dissolution « souvenir », étiquettes, rubans, particules
+src/film/puzzle.js       pièces du logo, mur invisible, carton final
 src/post.js              flou de mouvement, profondeur de champ, bloom, étalonnage, grain
 src/overlay.js           signature finale
 render/render.mjs        rendu Chromium headless + ffmpeg
@@ -37,16 +47,16 @@ npm install
 pip install numpy scipy pillow scikit-image shapely opencv-python-headless   # pour prep/
 python3 prep/vectorize.py          # seulement si le logo change
 python3 prep/sound.py              # bande son
-node render/render.mjs             # toutes les images -> output/segments/ (≈ 1 h sans GPU)
+node render/render.mjs             # toutes les images -> output/segments/ (long sans GPU)
 node render/render.mjs --assemble  # -> output/exprnc-motion.mp4
 ```
 
-Aperçu rapide : `node render/render.mjs --w 960 --h 540 --q 0.5 --segdir /tmp/prev` puis
+Aperçu rapide : `node render/render.mjs --w 960 --h 540 --q 0.4 --segdir /tmp/prev` puis
 `node render/render.mjs --assemble --segdir /tmp/prev --out /tmp/preview.mp4`.
-Images de contrôle : `node render/render.mjs --stills 2.5s,6.9s,9.5s`.
+Images de contrôle : `node render/render.mjs --stills 3.7s,9.5s,21.5s`.
 
 ## Personnaliser
 
-- Textes : `src/overlay.js` (`TAGLINE`) et `src/act1.js` (mots « Expérience » / « Exprnc. »).
+- Signature : `src/overlay.js` (`TAGLINE`).
+- Noms / sous-titres des concepts : `label: [...]` dans chaque classe de `src/film/visions.js`.
 - Rythme : `CUES` dans `src/timeline.js` (le son suit automatiquement ces repères).
-- Couleurs / lumière / matières : `src/act2.js` (`buildLights`, `buildPieces`, `buildFloor`).

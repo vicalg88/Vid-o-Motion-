@@ -1,9 +1,9 @@
 // ---------------------------------------------------------------------------
-// Calque 2D au-dessus de la 3D : signature finale sous le logo.
+// Calque 2D au-dessus de la 3D : signature finale sous le logo
 // ---------------------------------------------------------------------------
 import { E, CUES, remap } from './timeline.js';
 
-export const TAGLINE = "L'EXPÉRIENCE, PIÈCE PAR PIÈCE.";
+export const TAGLINE = 'DES EXPÉRIENCES QUI MARQUENT.';
 
 export class Overlay {
   constructor(canvas) {
@@ -13,8 +13,8 @@ export class Overlay {
     this.H = canvas.height;
     this.S = this.W / 1920;
     const ctx = this.ctx;
-    this.fs = 31 * this.S;
-    this.ls = 0.36 * this.fs;
+    this.fs = 34 * this.S;
+    this.ls = 0.34 * this.fs;
     ctx.font = `600 ${this.fs}px Mont600`;
     ctx.letterSpacing = `${this.ls}px`;
     this.xs = [];
@@ -36,22 +36,20 @@ export class Overlay {
     for (let i = 0; i < n; i++) {
       const ch = TAGLINE[i];
       if (ch === ' ') continue;
-      // révélation depuis le centre vers l'extérieur
       const centerDist = Math.abs(i - (n - 1) / 2) / ((n - 1) / 2);
-      const t0 = CUES.tagline + centerDist * 0.32;
-      const u = remap(t, t0, t0 + 0.6);
+      const t0 = CUES.tagline + centerDist * 0.38;
+      const u = remap(t, t0, t0 + 0.7);
       if (u <= 0) continue;
       const a = E.outCubic(u);
-      const dy = (1 - E.outQuart(u)) * 16 * S;
-      ctx.fillStyle = `rgba(236,233,226,${0.86 * a})`;
+      const dy = (1 - E.outQuart(u)) * 18 * S;
+      ctx.fillStyle = `rgba(238,234,226,${0.9 * a})`;
       ctx.fillText(ch, this.x0 + this.xs[i], this.y + dy);
     }
-    // fin filet décoratif
-    const lu = E.inOutCubic(remap(t, CUES.tagline + 0.15, CUES.tagline + 0.9));
+    const lu = E.inOutCubic(remap(t, CUES.tagline + 0.2, CUES.tagline + 1.0));
     if (lu > 0) {
-      const lw = 64 * S * lu;
-      ctx.fillStyle = `rgba(236,233,226,${0.45 * lu})`;
-      ctx.fillRect(this.W / 2 - lw / 2, this.y + 30 * S, lw, 1.5 * S);
+      const lw = 70 * S * lu;
+      ctx.fillStyle = `rgba(238,234,226,${0.45 * lu})`;
+      ctx.fillRect(this.W / 2 - lw / 2, this.y + 34 * S, lw, 1.5 * S);
     }
   }
 }
