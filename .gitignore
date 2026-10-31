@@ -1,0 +1,4 @@
+node_modules/
+output/segments/
+output/stills/
+__pycache__/

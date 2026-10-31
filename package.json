@@ -1,0 +1,15 @@
+{
+  "name": "exprnc-motion",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Vidéo motion design Exprnc. — rendu déterministe three.js + Playwright + ffmpeg",
+  "scripts": {
+    "vectorize": "python3 prep/vectorize.py",
+    "audio": "python3 prep/sound.py",
+    "render": "node render/render.mjs"
+  },
+  "dependencies": {
+    "three": "0.169.0"
+  }
+}
