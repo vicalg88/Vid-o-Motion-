@@ -57,15 +57,22 @@ async function assemble() {
   fs.writeFileSync(list, segs.map((s) => `file '${path.join(SEGDIR, s)}'`).join('\n'));
   const audio = path.resolve(arg('audio', path.join(OUTDIR, 'audio.wav')));
   const out = path.resolve(arg('out', path.join(OUTDIR, 'exprnc-motion.mp4')));
-  const args = ['-y', '-hide_banner', '-loglevel', 'warning', '-f', 'concat', '-safe', '0', '-i', list];
-  if (fs.existsSync(audio)) args.push('-i', audio);
-  args.push(
+  const bitrate = String(arg('bitrate', '18M'));
+  const common = [
     '-vf', 'scale=out_color_matrix=bt709:out_range=tv,format=yuv420p',
-    '-c:v', 'libx264', '-preset', 'slow', '-crf', '13', '-profile:v', 'high', '-tune', 'film',
+    '-c:v', 'libx264', '-preset', 'slow', '-profile:v', 'high', '-tune', 'grain',
+    '-b:v', bitrate, '-maxrate', String(Math.round(parseFloat(bitrate) * 1.5)) + 'M', '-bufsize', String(Math.round(parseFloat(bitrate) * 2)) + 'M',
     '-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-color_range', 'tv',
-    '-r', String(FPS), '-movflags', '+faststart'
-  );
-  if (fs.existsSync(audio)) args.push('-c:a', 'aac', '-b:a', '320k', '-shortest');
+    '-r', String(FPS), '-passlogfile', path.join(SEGDIR, 'x264pass'),
+  ];
+  const input = ['-y', '-hide_banner', '-loglevel', 'warning', '-f', 'concat', '-safe', '0', '-i', list];
+  // passe 1 (analyse)
+  await run('ffmpeg', [...input, ...common, '-pass', '1', '-an', '-f', 'mp4', '/dev/null']);
+  // passe 2 (+ audio)
+  const args = [...input];
+  if (fs.existsSync(audio)) args.push('-i', audio);
+  args.push(...common, '-pass', '2', '-movflags', '+faststart');
+  if (fs.existsSync(audio)) args.push('-c:a', 'aac', '-b:a', '256k', '-shortest');
   args.push(out);
   await run('ffmpeg', args);
   console.log('vidéo écrite :', out);
